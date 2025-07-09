@@ -98,90 +98,77 @@
     "endpoints": {
       "results": {
         "/": {
-          "status_code": 200,
-          "response_time": 1.5949945449829102,
-          "success": true,
-          "content_length": 16828
+          "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+          "success": false,
+          "response_time": null
         },
         "/dashboard": {
-          "status_code": 200,
-          "response_time": 0.008740663528442383,
-          "success": true,
-          "content_length": 17376
+          "error": "HTTPConnectionPool(host='0.0.0.0', port=8080): Max retries exceeded with url: /dashboard (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f6740e557f0>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+          "success": false,
+          "response_time": null
         },
         "/automated-accounting": {
-          "status_code": 200,
-          "response_time": 0.0056591033935546875,
-          "success": true,
-          "content_length": 17376
+          "error": "HTTPConnectionPool(host='0.0.0.0', port=8080): Max retries exceeded with url: /automated-accounting (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f6740e54650>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+          "success": false,
+          "response_time": null
         },
         "/bank-reconciliation": {
-          "status_code": 200,
-          "response_time": 0.006933450698852539,
-          "success": true,
-          "content_length": 17376
+          "error": "HTTPConnectionPool(host='0.0.0.0', port=8080): Max retries exceeded with url: /bank-reconciliation (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f6740e55fa0>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+          "success": false,
+          "response_time": null
         },
         "/financial-reports": {
-          "status_code": 404,
-          "response_time": 0.003421306610107422,
+          "error": "HTTPConnectionPool(host='0.0.0.0', port=8080): Max retries exceeded with url: /financial-reports (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f6740e56750>: Failed to establish a new connection: [Errno 111] Connection refused'))",
           "success": false,
-          "content_length": 207
+          "response_time": null
         },
         "/api/health": {
-          "status_code": 404,
-          "response_time": 0.0023698806762695312,
-          "success": true,
-          "content_length": 207
+          "error": "HTTPConnectionPool(host='0.0.0.0', port=8080): Max retries exceeded with url: /api/health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f6740e56f00>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+          "success": false,
+          "response_time": null
         },
         "/api/upload": {
-          "status_code": 404,
-          "response_time": 0.002135753631591797,
+          "error": "HTTPConnectionPool(host='0.0.0.0', port=8080): Max retries exceeded with url: /api/upload (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f6740e577a0>: Failed to establish a new connection: [Errno 111] Connection refused'))",
           "success": false,
-          "content_length": 207
+          "response_time": null
         },
         "/api/validation/status": {
-          "status_code": 404,
-          "response_time": 0.0019540786743164062,
-          "success": true,
-          "content_length": 207
+          "error": "HTTPConnectionPool(host='0.0.0.0', port=8080): Max retries exceeded with url: /api/validation/status (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f6740e56cf0>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+          "success": false,
+          "response_time": null
         }
       },
-      "success_rate": 75.0,
+      "success_rate": 0.0,
       "total_tested": 8,
-      "successful": 6
+      "successful": 0
     },
     "error_handling": {
       "results": {
         "Invalid JSON payload": {
-          "status_code": 404,
-          "proper_error_handling": true,
-          "response_content": "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try agai"
+          "error": "HTTPConnectionPool(host='0.0.0.0', port=8080): Max retries exceeded with url: /api/upload (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f6740e561b0>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+          "proper_error_handling": false
         },
         "Missing required parameters": {
-          "status_code": 404,
-          "proper_error_handling": true,
-          "response_content": "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try agai"
+          "error": "HTTPConnectionPool(host='0.0.0.0', port=8080): Max retries exceeded with url: /api/upload (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f6740e54830>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+          "proper_error_handling": false
         },
         "Non-existent endpoint": {
-          "status_code": 404,
-          "proper_error_handling": true,
-          "response_content": "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try agai"
+          "error": "HTTPConnectionPool(host='0.0.0.0', port=8080): Max retries exceeded with url: /api/nonexistent (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f6740e57f20>: Failed to establish a new connection: [Errno 111] Connection refused'))",
+          "proper_error_handling": false
         }
       },
-      "proper_handling_rate": 100.0,
+      "proper_handling_rate": 0.0,
       "total_tested": 3
     },
     "authentication": {
       "individual_tests": {
         "session_based_auth": {
-          "secure": true,
-          "login_endpoint_working": true,
-          "session_created": false
+          "secure": false,
+          "error": "HTTPConnectionPool(host='0.0.0.0', port=8080): Max retries exceeded with url: /auth/login (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f6740c94920>: Failed to establish a new connection: [Errno 111] Connection refused'))"
         },
         "protected_endpoints": {
           "secure": false,
-          "protection_working": false,
-          "redirects_to_login": false
+          "error": "HTTPConnectionPool(host='0.0.0.0', port=8080): Max retries exceeded with url: /dashboard (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f6740e578f0>: Failed to establish a new connection: [Errno 111] Connection refused'))"
         },
         "unauthorized_access": {
           "secure": true,
@@ -195,8 +182,8 @@
           "session_management": true
         }
       },
-      "auth_score": 75.0,
-      "authentication_working": true
+      "auth_score": 50.0,
+      "authentication_working": false
     }
   },
   "data_flow_tests": {
@@ -287,8 +274,110 @@
   "scalability_tests": {},
   "gcp_compatibility_tests": {},
   "neon_db_tests": {},
-  "flaws_identified": [],
-  "critical_issues": [],
+  "flaws_identified": [
+    {
+      "description": "API endpoint unreachable: /",
+      "category": "API_CONNECTION",
+      "severity": "CRITICAL",
+      "timestamp": "2025-07-09T07:01:12.673572"
+    },
+    {
+      "description": "API endpoint unreachable: /dashboard",
+      "category": "API_CONNECTION",
+      "severity": "CRITICAL",
+      "timestamp": "2025-07-09T07:01:12.676675"
+    },
+    {
+      "description": "API endpoint unreachable: /automated-accounting",
+      "category": "API_CONNECTION",
+      "severity": "CRITICAL",
+      "timestamp": "2025-07-09T07:01:12.678017"
+    },
+    {
+      "description": "API endpoint unreachable: /bank-reconciliation",
+      "category": "API_CONNECTION",
+      "severity": "CRITICAL",
+      "timestamp": "2025-07-09T07:01:12.679142"
+    },
+    {
+      "description": "API endpoint unreachable: /financial-reports",
+      "category": "API_CONNECTION",
+      "severity": "CRITICAL",
+      "timestamp": "2025-07-09T07:01:12.680175"
+    },
+    {
+      "description": "API endpoint unreachable: /api/health",
+      "category": "API_CONNECTION",
+      "severity": "CRITICAL",
+      "timestamp": "2025-07-09T07:01:12.681154"
+    },
+    {
+      "description": "API endpoint unreachable: /api/upload",
+      "category": "API_CONNECTION",
+      "severity": "CRITICAL",
+      "timestamp": "2025-07-09T07:01:12.682840"
+    },
+    {
+      "description": "API endpoint unreachable: /api/validation/status",
+      "category": "API_CONNECTION",
+      "severity": "CRITICAL",
+      "timestamp": "2025-07-09T07:01:12.684056"
+    },
+    {
+      "description": "API error handling needs improvement",
+      "category": "API_ERROR_HANDLING",
+      "severity": "NORMAL",
+      "timestamp": "2025-07-09T07:01:12.688369"
+    },
+    {
+      "description": "API authentication mechanisms need improvement",
+      "category": "API_AUTHENTICATION",
+      "severity": "NORMAL",
+      "timestamp": "2025-07-09T07:01:12.693189"
+    }
+  ],
+  "critical_issues": [
+    {
+      "description": "API endpoint unreachable: /",
+      "category": "API_CONNECTION",
+      "timestamp": "2025-07-09T07:01:12.673586"
+    },
+    {
+      "description": "API endpoint unreachable: /dashboard",
+      "category": "API_CONNECTION",
+      "timestamp": "2025-07-09T07:01:12.676683"
+    },
+    {
+      "description": "API endpoint unreachable: /automated-accounting",
+      "category": "API_CONNECTION",
+      "timestamp": "2025-07-09T07:01:12.678023"
+    },
+    {
+      "description": "API endpoint unreachable: /bank-reconciliation",
+      "category": "API_CONNECTION",
+      "timestamp": "2025-07-09T07:01:12.679146"
+    },
+    {
+      "description": "API endpoint unreachable: /financial-reports",
+      "category": "API_CONNECTION",
+      "timestamp": "2025-07-09T07:01:12.680179"
+    },
+    {
+      "description": "API endpoint unreachable: /api/health",
+      "category": "API_CONNECTION",
+      "timestamp": "2025-07-09T07:01:12.681157"
+    },
+    {
+      "description": "API endpoint unreachable: /api/upload",
+      "category": "API_CONNECTION",
+      "timestamp": "2025-07-09T07:01:12.682846"
+    },
+    {
+      "description": "API endpoint unreachable: /api/validation/status",
+      "category": "API_CONNECTION",
+      "timestamp": "2025-07-09T07:01:12.684063"
+    }
+  ],
   "recommendations": [],
   "test_summary": {},
   "critical_error": "'BackendComprehensiveTest' object has no attribute '_test_concurrent_users'"
