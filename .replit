@@ -1,0 +1,9 @@
+modules = ["python-3.12", "web", "nodejs-20", "gcloud", "python-3.10", "docker"]
+run = "python main.py"
+
+[nix]
+channel = "stable-24_05"
+packages = ["glibcLocales"]
+
+[deployment]
+run = ["sh", "-c", "python main.py"]
