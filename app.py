@@ -77,12 +77,16 @@ def create_app():
     os.makedirs(upload_folder, exist_ok=True)
     os.makedirs(reports_folder, exist_ok=True)
     
-    # Redis configuration for caching
-    redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+    # Redis configuration for caching (optional for Replit)
     try:
-        app.redis = redis.from_url(redis_url, decode_responses=True)
-        app.redis.ping()
-        logging.info("Redis connection established")
+        redis_url = os.environ.get("REDIS_URL")
+        if redis_url:
+            app.redis = redis.from_url(redis_url, decode_responses=True)
+            app.redis.ping()
+            logging.info("Redis connection established")
+        else:
+            app.redis = None
+            logging.info("Redis not configured, proceeding without caching")
     except Exception as e:
         logging.warning(f"Redis connection failed: {e}. Proceeding without caching.")
         app.redis = None

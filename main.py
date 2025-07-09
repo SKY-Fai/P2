@@ -79,12 +79,20 @@ try:
         logger.info(f"Environment: {os.environ.get('FLASK_ENV', 'development')}")
         logger.info(f"Database URL configured: {'Yes' if os.environ.get('DATABASE_URL') else 'No'}")
         logger.info(f"Redis configured: {'Yes' if hasattr(app, 'redis') and app.redis else 'No'}")
+        
+        # Initialize database tables
+        try:
+            db.create_all()
+            logger.info("Database tables initialized successfully")
+        except Exception as e:
+            logger.error(f"Database initialization error: {e}")
+            # Continue without failing - use SQLite fallback
 
     if __name__ == '__main__':
         # Development server configuration
         debug_mode = os.environ.get('FLASK_ENV') != 'production'
-        port = int(os.environ.get('PORT', 8080))
-        host = '0.0.0.0'  # Required for Replit and GCP
+        port = int(os.environ.get('PORT', 5000))
+        host = '0.0.0.0'  # Required for Replit
 
         logger.info(f"Starting F-AI Accountant on {host}:{port}")
         logger.info(f"Debug mode: {debug_mode}")

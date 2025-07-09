@@ -80,14 +80,17 @@ def login():
                         role = UserRole.VIEWER
                 
                 # Check if this is the first user (will be main admin)
-                existing_users = User.query.count()
-                is_admin = existing_users == 0 or 'admin' in username_lower
+                try:
+                    existing_users = User.query.count()
+                    is_admin = existing_users == 0 or 'admin' in username_lower
+                except Exception:
+                    is_admin = 'admin' in username_lower
                 
                 user = User(
                     username=username,
                     email=f"{username}@accufin360.com",
                     password_hash=generate_password_hash("dummy123"),
-                    first_name=username.split('_')[0].capitalize(),
+                    first_name=username.split('_')[0].capitalize() if '_' in username else username.capitalize(),
                     last_name="User",
                     category=category,
                     non_individual_type=non_individual_type,
