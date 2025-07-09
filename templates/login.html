@@ -15,32 +15,33 @@
             </div>
             <div class="card-body">
                 <form method="POST" action="{{ url_for('auth.login') }}">
+                    {{ csrf_token() }}
                     <div class="mb-3">
                         <label for="username" class="form-label">
                             <i class="fas fa-user me-1"></i>Username
                         </label>
                         <input type="text" class="form-control" id="username" name="username" required>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="password" class="form-label">
                             <i class="fas fa-lock me-1"></i>Password <small class="text-muted">(optional for demo)</small>
                         </label>
                         <input type="password" class="form-control" id="password" name="password" placeholder="Not required for demo">
                     </div>
-                    
+
                     <div class="mb-3 form-check">
                         <input type="checkbox" class="form-check-input" id="remember" name="remember">
                         <label class="form-check-label" for="remember">
                             Remember me
                         </label>
                     </div>
-                    
+
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="fas fa-sign-in-alt me-1"></i>Login
                     </button>
                 </form>
-                
+
                 <div class="text-center mt-3">
                     <p class="mb-0">Don't have an account? 
                         <a href="{{ url_for('auth.register') }}" class="text-decoration-none">Register here</a>
@@ -48,7 +49,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Demo Login Information -->
         <div class="card mt-4">
             <div class="card-header">
@@ -62,9 +63,9 @@
                     <strong>Easy Login!</strong> Just enter any username - no password required! 
                     Your account will be created automatically.
                 </div>
-                
+
                 <p class="small text-muted">Try these usernames to get different access levels:</p>
-                
+
                 <div class="row">
                     <div class="col-md-6">
                         <ul class="list-unstyled">
@@ -81,7 +82,7 @@
                         </ul>
                     </div>
                 </div>
-                
+
                 <p class="small text-muted">
                     <i class="fas fa-lightbulb me-1"></i>
                     <strong>Tip:</strong> Include keywords like "admin", "accountant", "auditor", or "ca" in your username to get specific roles!

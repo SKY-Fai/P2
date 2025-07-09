@@ -115,6 +115,12 @@
             }
         },
 
+        // Get CSRF token from meta tag
+        getCSRFToken() {
+            const token = document.querySelector('meta[name="csrf-token"]');
+            return token ? token.getAttribute('content') : '';
+        },
+
         // API utilities
         api: {
             request: function(url, options = {}) {
@@ -156,17 +162,6 @@
 
         // Utility functions
         utils: {
-            formatCurrency: function(amount, currency = 'USD') {
-                try {
-                    return new Intl.NumberFormat('en-US', {
-                        style: 'currency',
-                        currency: currency
-                    }).format(amount);
-                } catch (e) {
-                    return `${currency} ${amount}`;
-                }
-            },
-
             debounce: function(func, wait) {
                 let timeout;
                 return function executedFunction(...args) {
@@ -188,6 +183,17 @@
                         setTimeout(() => inThrottle = false, limit);
                     }
                 };
+            },
+
+            formatCurrency: function(amount, currency = 'USD') {
+                try {
+                    return new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: currency
+                    }).format(amount);
+                } catch (e) {
+                    return `${currency} ${amount}`;
+                }
             },
 
             formatNumber: function(number, decimals = 2) {

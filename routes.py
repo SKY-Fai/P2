@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, send_file, current_app
 from flask_login import login_required, current_user
+from flask_wtf.csrf import exempt
 from werkzeug.utils import secure_filename
 import os
 import logging
@@ -35,6 +36,7 @@ main_bp = Blueprint('main', __name__)
 
 # API Endpoints for frontend communication
 @main_bp.route('/api/log-error', methods=['POST'])
+@exempt
 def log_error():
     """Handle frontend error logging"""
     try:
@@ -73,6 +75,7 @@ def api_health():
 
 @main_bp.route('/api/upload', methods=['POST'])
 @login_required
+@exempt
 def api_upload():
     """API endpoint for file uploads"""
     try:

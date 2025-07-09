@@ -12,7 +12,7 @@
             background-color: rgba(13, 110, 253, 0.1) !important;
             transition: background-color 0.3s ease;
         }
-        
+
         .table th {
             border-top: none;
             font-weight: 600;
@@ -20,33 +20,33 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        
+
         .table td {
             vertical-align: middle;
             border-color: rgba(222, 226, 230, 0.1);
             border-width: 0.5px;
         }
-        
+
         .card {
             border: 0.5px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        
+
         .container-fluid {
             border: none !important;
         }
-        
+
         body {
             border: none !important;
             margin: 0;
             padding: 0;
         }
-        
+
         .badge {
             font-size: 0.75rem;
             font-weight: 500;
         }
-        
+
         .btn-outline-primary:hover,
         .btn-outline-secondary:hover,
         .btn-outline-success:hover,
@@ -57,60 +57,60 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
-        
+
         .navbar-nav .nav-link {
             color: #dc3545 !important;
             font-weight: 500;
         }
-        
+
         .navbar-nav .nav-link:hover {
             color: #c82333 !important;
         }
-        
+
         .navbar-nav .nav-link.active {
             color: #dc3545 !important;
             font-weight: 600;
         }
-        
+
         .navbar-brand {
             color: #dc3545 !important;
             font-weight: 600;
         }
-        
+
         .navbar-brand:hover {
             color: #c82333 !important;
         }
-        
+
         /* Navigation Consistency Fixes */
         .navbar {
             background-color: #343a40 !important;
         }
-        
+
         .navbar-nav .nav-link {
             color: #dc3545 !important;
             transition: color 0.3s ease;
         }
-        
+
         .navbar-nav .nav-link:hover {
             color: #c82333 !important;
         }
-        
+
         .dropdown-item {
             color: #dc3545 !important;
         }
-        
+
         .dropdown-item:hover {
             background-color: rgba(220, 53, 69, 0.1) !important;
             color: #c82333 !important;
         }
-        
+
         /* Logo consistency */
         .logo-image {
             height: 30px;
             width: auto;
             margin-right: 8px;
         }
-        
+
         .theme-toggle {
             background: none;
             border: 2px solid rgba(255, 255, 255, 0.3);
@@ -125,67 +125,67 @@
             cursor: pointer;
             font-size: 0.9rem;
         }
-        
+
         .theme-toggle:hover {
             background: rgba(255, 255, 255, 0.1);
             color: white;
             transform: scale(1.05);
         }
-        
+
         /* Enhanced Navigation Responsiveness */
         .navbar-toggler {
             border: none;
             outline: none;
             padding: 0.25rem 0.5rem;
         }
-        
+
         .navbar-toggler:focus {
             box-shadow: none;
             outline: none;
         }
-        
+
         .navbar-collapse {
             transition: all 0.3s ease-in-out;
         }
-        
+
         .nav-link {
             position: relative;
             cursor: pointer;
             text-decoration: none;
             transition: all 0.3s ease;
         }
-        
+
         .nav-link:hover {
             text-decoration: none;
         }
-        
+
         .dropdown-menu {
             border: none;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             border-radius: 8px;
         }
-        
+
         .dropdown-item {
             transition: all 0.3s ease;
             padding: 0.5rem 1rem;
         }
-        
+
         .dropdown-item:hover {
             background-color: rgba(220, 53, 69, 0.1);
             color: #dc3545;
         }
-        
+
         /* Mobile responsiveness */
         @media (max-width: 991.98px) {
             .navbar-nav {
                 text-align: center;
                 margin-top: 1rem;
             }
-            
+
             .nav-item {
                 margin: 0.25rem 0;
             }
-            
+
             .dropdown-menu {
                 position: static !important;
                 transform: none !important;
@@ -195,16 +195,16 @@
             }
         }
     </style>
-    
+
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <!-- DataTables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-    
+
     <!-- CSRF Token for API calls -->
     <meta name="csrf-token" content="{{ csrf_token() if csrf_token else '' }}">
-    
+
     {% block extra_head %}{% endblock %}
 
 </head>
@@ -218,11 +218,11 @@
                 <img src="{{ url_for('static', filename='images/f-ai-logo.png') }}" alt="F-AI Logo" class="logo-image">
                 F-AI
             </a>
-            
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 {% if current_user.is_authenticated %}
                 <ul class="navbar-nav mx-auto justify-content-center">
@@ -231,7 +231,7 @@
                             <i class="fas fa-tachometer-alt me-1"></i>Dashboard
                         </a>
                     </li>
-                    
+
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="aiAccountingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-robot me-1"></i>AI Accounting
@@ -255,13 +255,13 @@
                             </a></li>
                         </ul>
                     </li>
-                    
+
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('main.file_interaction') }}">
                             <i class="fas fa-folder-open me-1"></i>File Interaction
                         </a>
                     </li>
-                    
+
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="portalsDropdown" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-th-large me-1"></i>Portals
@@ -272,60 +272,60 @@
                                 <i class="fas fa-users-cog me-2"></i>Admin Portal
                             </a></li>
                             {% endif %}
-                            
+
                             {% if current_user.can_access_portal('invoice') %}
                             <li><a class="dropdown-item" href="{{ url_for('main.invoice_portal') }}">
                                 <i class="fas fa-file-invoice me-2"></i>Invoice Management
                             </a></li>
                             {% endif %}
-                            
+
                             {% if current_user.can_access_portal('inventory') %}
                             <li><a class="dropdown-item" href="{{ url_for('main.inventory_portal') }}">
                                 <i class="fas fa-boxes me-2"></i>Inventory Management
                             </a></li>
                             {% endif %}
-                            
+
                             {% if current_user.can_access_portal('gst') %}
                             <li><a class="dropdown-item" href="{{ url_for('main.gst_portal') }}">
                                 <i class="fas fa-receipt me-2"></i>GST Compliance
                             </a></li>
                             {% endif %}
-                            
+
                             {% if current_user.can_access_portal('audit') %}
                             <li><a class="dropdown-item" href="{{ url_for('main.audit_portal') }}">
                                 <i class="fas fa-search me-2"></i>Audit Management
                             </a></li>
                             {% endif %}
-                            
+
                             {% if current_user.can_access_portal('reports') %}
                             <li><a class="dropdown-item" href="{{ url_for('main.reports_portal') }}">
                                 <i class="fas fa-chart-line me-2"></i>Financial Reports
                             </a></li>
                             {% endif %}
-                            
+
                             {% if current_user.can_access_portal('ai_insights') %}
                             <li><a class="dropdown-item" href="{{ url_for('main.ai_insights_portal') }}">
                                 <i class="fas fa-brain me-2"></i>AI Insights
                             </a></li>
                             {% endif %}
-                            
+
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ url_for('main.validation_dashboard') }}">
                                 <i class="fas fa-shield-alt me-2"></i>Validation Dashboard
                             </a></li>
                         </ul>
                     </li>
-                    
+
 
                 </ul>
-                
+
                 <ul class="navbar-nav">
                     <li class="nav-item me-2">
                         <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
                             <i class="fas fa-moon"></i>
                         </button>
                     </li>
-                    
+
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-user me-1"></i>{{ current_user.get_full_name() }}
@@ -358,7 +358,7 @@
             </div>
         </div>
     </nav>
-    
+
     <!-- Main Content -->
     <main class="main-content" style="margin-top: 80px; padding: 20px;">
         <div class="container-fluid">
@@ -377,12 +377,12 @@
                     </div>
                 {% endif %}
             {% endwith %}
-            
+
             <!-- Page Content -->
             {% block content %}{% endblock %}
         </div>
     </main>
-    
+
     <!-- Footer -->
     <footer class="footer bg-dark text-light mt-5">
         <div class="container">
@@ -397,17 +397,17 @@
             </div>
         </div>
     </footer>
-    
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
+
     <!-- DataTables -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    
+
     {% block extra_scripts %}{% endblock %}
-    
+
     <!-- F-AI Unified JavaScript Architecture -->
     <script src="{{ url_for('static', filename='js/core.js') }}"></script>
     <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
@@ -417,31 +417,31 @@
         // Enhanced Navigation Initialization
         document.addEventListener('DOMContentLoaded', function() {
             console.log('F-AI Accountant Dashboard loaded');
-            
+
             // Initialize Bootstrap components
             initializeBootstrapComponents();
-            
+
             // Initialize theme system
             if (window.FaiTheme && !window.FaiTheme.instance) {
                 window.FaiTheme.instance = new window.FaiTheme();
             }
-            
+
             // Initialize navigation
             if (window.FaiNavigation) {
                 new FaiNavigation();
             }
-            
+
             // Enhanced navigation click handlers
             initializeNavigationHandlers();
         });
-        
+
         function initializeBootstrapComponents() {
             // Initialize all Bootstrap dropdowns
             var dropdowns = document.querySelectorAll('.dropdown-toggle');
             dropdowns.forEach(function(dropdown) {
                 new bootstrap.Dropdown(dropdown);
             });
-            
+
             // Initialize navbar collapse
             var navbarToggler = document.querySelector('.navbar-toggler');
             var navbarCollapse = document.querySelector('.navbar-collapse');
@@ -449,7 +449,7 @@
                 new bootstrap.Collapse(navbarCollapse, { toggle: false });
             }
         }
-        
+
         function initializeNavigationHandlers() {
             // Add click handlers for all navigation links
             var navLinks = document.querySelectorAll('.nav-link:not(.dropdown-toggle)');
@@ -462,13 +462,13 @@
                         if (navbarCollapse && navbarCollapse.classList.contains('show')) {
                             bootstrap.Collapse.getInstance(navbarCollapse).hide();
                         }
-                        
+
                         // Add loading indicator
                         showNavigationLoading(this);
                     }
                 });
             });
-            
+
             // Handle dropdown items
             var dropdownItems = document.querySelectorAll('.dropdown-item');
             dropdownItems.forEach(function(item) {
@@ -479,11 +479,11 @@
                 });
             });
         }
-        
+
         function showNavigationLoading(element) {
             var originalText = element.innerHTML;
             element.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>' + element.textContent;
-            
+
             // Reset after a short delay if page doesn't change
             setTimeout(function() {
                 if (element) {
@@ -491,14 +491,14 @@
                 }
             }, 3000);
         }
-        
+
         // Global theme toggle function
         function toggleTheme() {
             if (window.FaiTheme && window.FaiTheme.instance) {
                 window.FaiTheme.instance.toggleTheme();
             }
         }
-        
+
         // Global navigation helper
         function navigateToPage(url) {
             if (url && url !== '#') {

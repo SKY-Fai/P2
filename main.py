@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 """
 F-AI Accountant - Main Application Entry Point
@@ -25,29 +24,29 @@ logger = logging.getLogger(__name__)
 try:
     from app import create_app
     from utils.error_handlers import register_error_handlers
-    
+
     # Create Flask application
     app = create_app()
-    
+
     # Register error handlers
     register_error_handlers(app)
-    
+
     # Add startup logging
     with app.app_context():
         logger.info("F-AI Accountant application started")
         logger.info(f"Environment: {os.environ.get('FLASK_ENV', 'development')}")
         logger.info(f"Database URL configured: {'Yes' if os.environ.get('DATABASE_URL') else 'No'}")
         logger.info(f"Redis configured: {'Yes' if hasattr(app, 'redis') and app.redis else 'No'}")
-    
+
     if __name__ == '__main__':
         # Development server configuration
         debug_mode = os.environ.get('FLASK_ENV') != 'production'
-        port = int(os.environ.get('PORT', 5000))
+        port = int(os.environ.get('PORT', 8080))
         host = '0.0.0.0'  # Required for Replit
-        
+
         logger.info(f"Starting F-AI Accountant on {host}:{port}")
         logger.info(f"Debug mode: {debug_mode}")
-        
+
         try:
             app.run(
                 host=host,
