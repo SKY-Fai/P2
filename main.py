@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 """
 F-AI Accountant - Main Application Entry Point
@@ -44,12 +43,12 @@ try:
         except Exception as e:
             logger.error(f"Health check database error: {e}")
             db_status = "unhealthy"
-            
+
         # Check Redis connection
         redis_status = "healthy" if hasattr(app, 'redis') and app.redis else "unavailable"
-        
+
         status_code = 200 if db_status == "healthy" else 503
-        
+
         return {
             "status": "healthy" if db_status == "healthy" else "unhealthy",
             "database": db_status,
@@ -79,7 +78,7 @@ try:
         logger.info(f"Environment: {os.environ.get('FLASK_ENV', 'development')}")
         logger.info(f"Database URL configured: {'Yes' if os.environ.get('DATABASE_URL') else 'No'}")
         logger.info(f"Redis configured: {'Yes' if hasattr(app, 'redis') and app.redis else 'No'}")
-        
+
         # Initialize database tables
         try:
             from app import db
