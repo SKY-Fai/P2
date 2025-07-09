@@ -316,10 +316,55 @@
                     </h5>
 
                     <div id="fileListContainer">
-                        <div class="text-center text-muted py-5">
-                            <i class="fas fa-file-upload fa-3x mb-3"></i>
-                            <p>No files uploaded yet</p>
-                            <small>Upload files to see them listed here</small>
+                        <!-- Demo Files for Preview -->
+                        <div class="file-item demo-file" data-file-id="demo1">
+                            <div class="file-icon excel">
+                                <i class="fas fa-file-excel"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">Sales_Data_Q1_2024.xlsx</h6>
+                                <small class="text-muted">2.4 MB • sales</small>
+                            </div>
+                            <div class="text-end">
+                                <button class="btn btn-sm btn-outline-primary me-1" onclick="previewDemoFile('demo1')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="file-item demo-file" data-file-id="demo2">
+                            <div class="file-icon word">
+                                <i class="fas fa-file-word"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">Financial_Report_Q1.docx</h6>
+                                <small class="text-muted">1.8 MB • financial</small>
+                            </div>
+                            <div class="text-end">
+                                <button class="btn btn-sm btn-outline-primary me-1" onclick="previewDemoFile('demo2')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="file-item demo-file" data-file-id="demo3">
+                            <div class="file-icon pdf">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">Invoice_INV-2024-001.pdf</h6>
+                                <small class="text-muted">924 KB • sales</small>
+                            </div>
+                            <div class="text-end">
+                                <button class="btn btn-sm btn-outline-primary me-1" onclick="previewDemoFile('demo3')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info mt-3">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <small>Demo files shown above. Click <strong>Preview</strong> to see file analysis.</small>
                         </div>
                     </div>
                 </div>
@@ -1213,6 +1258,112 @@ $(document).ready(function() {
         $('#uploadProgress').css('width', percent + '%');
         $('#progressText').text(text);
     }
+    
+    // Demo file preview function
+    window.previewDemoFile = function(fileId) {
+        $('.file-item').removeClass('selected');
+        $(`.file-item[data-file-id="${fileId}"]`).addClass('selected');
+        
+        const demoFiles = {
+            'demo1': {
+                name: 'Sales_Data_Q1_2024.xlsx',
+                type: 'excel',
+                size: 2441728,
+                folder: 'sales'
+            },
+            'demo2': {
+                name: 'Financial_Report_Q1.docx',
+                type: 'word',
+                size: 1887436,
+                folder: 'financial'
+            },
+            'demo3': {
+                name: 'Invoice_INV-2024-001.pdf',
+                type: 'pdf',
+                size: 946176,
+                folder: 'sales'
+            }
+        };
+        
+        const file = demoFiles[fileId];
+        if (file) {
+            selectedFile = file;
+            previewDemoFileContent(file);
+        }
+    };
+    
+    function previewDemoFileContent(file) {
+        const previewContainer = $('#previewContainer');
+        
+        let previewHtml = `
+            <div class="preview-header">
+                <h6 class="fw-bold">${file.name}</h6>
+                <small class="text-muted">
+                    ${formatFileSize(file.size)} • ${file.type.toUpperCase()} • Demo File
+                </small>
+            </div>
+        `;
+        
+        if (file.type === 'excel') {
+            previewHtml += generateExcelPreview(file);
+        } else if (file.type === 'word') {
+            previewHtml += generateWordPreview(file);
+        } else if (file.type === 'pdf') {
+            previewHtml += generatePdfPreview(file);
+        }
+        
+        previewHtml += `
+            <div class="mt-3">
+                <button class="btn btn-primary btn-sm me-2" onclick="openDemoFullPreview('${file.name}')">
+                    <i class="fas fa-expand me-1"></i>Full Preview
+                </button>
+                <button class="btn btn-success btn-sm" onclick="processDemoFile('${file.name}')">
+                    <i class="fas fa-cogs me-1"></i>Process Demo File
+                </button>
+            </div>
+        `;
+        
+        previewContainer.html(previewHtml);
+    }
+    
+    window.openDemoFullPreview = function(fileName) {
+        $('#modalPreviewContent').html($('#previewContainer').html());
+        $('#filePreviewModal .modal-title').html(`<i class="fas fa-file me-2"></i>Demo Preview: ${fileName}`);
+        $('#filePreviewModal').modal('show');
+    };
+    
+    window.processDemoFile = function(fileName) {
+        showNotification(`Demo processing started for ${fileName}`, 'info');
+        
+        // Simulate processing
+        showProgress();
+        updateProgress(0, 'Analyzing demo file...');
+        
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            progress += Math.random() * 25;
+            if (progress > 90) progress = 90;
+            updateProgress(progress, `Processing ${fileName}...`);
+        }, 300);
+        
+        setTimeout(() => {
+            clearInterval(progressInterval);
+            updateProgress(100, 'Demo processing complete!');
+            
+            setTimeout(() => {
+                hideProgress();
+                showNotification(`${fileName} processed successfully! This is a demo result.`, 'success');
+            }, 1000);
+        }, 2500);
+    };
+    
+    // Initialize with demo preview
+    setTimeout(() => {
+        previewDemoFile('demo1');
+        $('#fileCount').text('3');
+        $('.folder-item[data-folder="sales"] .folder-badge').text('2');
+        $('.folder-item[data-folder="financial"] .folder-badge').text('1');
+    }, 500);
     
     console.log('✅ Enhanced File Upload System Ready');
 });
