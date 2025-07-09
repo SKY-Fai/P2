@@ -82,6 +82,7 @@ try:
         
         # Initialize database tables
         try:
+            from app import db
             db.create_all()
             logger.info("Database tables initialized successfully")
         except Exception as e:
