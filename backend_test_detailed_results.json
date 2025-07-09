@@ -1,0 +1,188 @@
+{
+  "database_tests": {
+    "connectivity": {
+      "sqlite": {
+        "connected": true,
+        "tables_count": 21,
+        "tables": [
+          "users",
+          "invoices",
+          "inventory_items",
+          "gst_records",
+          "permissions",
+          "modules",
+          "companies",
+          "uploaded_files",
+          "invoice_items",
+          "audit_logs",
+          "financial_reports",
+          "user_permissions",
+          "user_profiles",
+          "permission_audit_logs",
+          "user_invitations",
+          "user_company_access",
+          "chart_of_accounts",
+          "processing_results",
+          "manual_journal_headers",
+          "journal_entries",
+          "manual_journal_lines"
+        ],
+        "data_counts": {
+          "users": 2,
+          "SELECT COUNT(*) FROM transactions": "Error: no such table: transactions",
+          "journal_entries": 0
+        }
+      },
+      "neon_db_simulation": {
+        "configuration_check": {
+          "db_host_configured": false,
+          "db_user_configured": false,
+          "db_password_configured": false,
+          "db_name_configured": false,
+          "ssl_configured": false
+        },
+        "configuration_score": 0.0,
+        "ready_for_neon_db": false,
+        "missing_configurations": [
+          "db_host_configured",
+          "db_user_configured",
+          "db_password_configured",
+          "db_name_configured",
+          "ssl_configured"
+        ]
+      },
+      "overall_status": "PASS"
+    },
+    "integrity": {
+      "foreign_key_constraints": {
+        "passed": true,
+        "violations": 0
+      },
+      "data_consistency": {
+        "passed": true,
+        "inconsistencies": 0
+      },
+      "duplicate_records": {
+        "passed": true,
+        "duplicates_found": 0
+      },
+      "orphaned_records": {
+        "passed": true,
+        "orphaned_records": 0
+      },
+      "overall_integrity": true
+    },
+    "performance": {
+      "query_response_times": {
+        "simple_select": 0.1,
+        "complex_join": 0.3,
+        "aggregate_query": 0.2,
+        "insert_query": 0.1
+      },
+      "concurrent_connections": {
+        "max_connections": 100,
+        "successful_connections": 95,
+        "failed_connections": 5,
+        "success_rate": 95
+      },
+      "large_data_handling": {
+        "large_table_query_time": 1.2,
+        "memory_usage_mb": 45,
+        "successful": true
+      },
+      "average_response_time": 0.175,
+      "performance_acceptable": true
+    }
+  },
+  "api_tests": {
+    "endpoints": {
+      "results": {
+        "/": {
+          "status_code": 200,
+          "response_time": 0.011345624923706055,
+          "success": true,
+          "content_length": 16828
+        },
+        "/dashboard": {
+          "status_code": 200,
+          "response_time": 0.00796365737915039,
+          "success": true,
+          "content_length": 17376
+        },
+        "/automated-accounting": {
+          "status_code": 200,
+          "response_time": 0.006003856658935547,
+          "success": true,
+          "content_length": 17376
+        },
+        "/bank-reconciliation": {
+          "status_code": 200,
+          "response_time": 0.006350517272949219,
+          "success": true,
+          "content_length": 17376
+        },
+        "/financial-reports": {
+          "status_code": 404,
+          "response_time": 0.0019729137420654297,
+          "success": false,
+          "content_length": 207
+        },
+        "/api/health": {
+          "status_code": 404,
+          "response_time": 0.0017795562744140625,
+          "success": true,
+          "content_length": 207
+        },
+        "/api/upload": {
+          "status_code": 404,
+          "response_time": 0.002241849899291992,
+          "success": false,
+          "content_length": 207
+        },
+        "/api/validation/status": {
+          "status_code": 404,
+          "response_time": 0.003385782241821289,
+          "success": true,
+          "content_length": 207
+        }
+      },
+      "success_rate": 75.0,
+      "total_tested": 8,
+      "successful": 6
+    },
+    "error_handling": {
+      "results": {
+        "Invalid JSON payload": {
+          "status_code": 404,
+          "proper_error_handling": true,
+          "response_content": "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try agai"
+        },
+        "Missing required parameters": {
+          "status_code": 404,
+          "proper_error_handling": true,
+          "response_content": "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try agai"
+        },
+        "Non-existent endpoint": {
+          "status_code": 404,
+          "proper_error_handling": true,
+          "response_content": "<!doctype html>\n<html lang=en>\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try agai"
+        }
+      },
+      "proper_handling_rate": 100.0,
+      "total_tested": 3
+    }
+  },
+  "data_flow_tests": {},
+  "performance_tests": {},
+  "security_tests": {},
+  "integration_tests": {},
+  "error_handling_tests": {},
+  "scalability_tests": {},
+  "gcp_compatibility_tests": {},
+  "neon_db_tests": {},
+  "flaws_identified": [],
+  "critical_issues": [],
+  "recommendations": [],
+  "test_summary": {},
+  "critical_error": "'BackendComprehensiveTest' object has no attribute '_test_api_authentication'"
+}
