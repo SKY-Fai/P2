@@ -11,6 +11,7 @@ from sqlalchemy.pool import QueuePool
 import redis
 from dotenv import load_dotenv
 from datetime import datetime
+from flask import redirect, url_for
 
 # Load environment variables
 load_dotenv()
@@ -90,15 +91,15 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
     
-    # Configure CSRF with exemptions for demo
+    # Configure CSRF protection
     csrf.init_app(app)
     
     # CSRF error handler
     @app.errorhandler(400)
     def csrf_error(error):
         if 'CSRF' in str(error):
-            logging.warning(f"CSRF error bypassed for demo: {error}")
-            return redirect(url_for('auth.login'))
+            logging.warning(f"CSRF error: {error}")
+            return {"error": "CSRF token missing or invalid"}, 400
         return {"error": "Bad request"}, 400
     
     login_manager.login_view = "auth.login"

@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 """
 F-AI Accountant - Main Application Entry Point
@@ -31,6 +32,47 @@ try:
     # Register error handlers
     register_error_handlers(app)
 
+    # Add health check endpoints
+    @app.route('/health')
+    def health_check():
+        """Health check endpoint for GCP App Engine"""
+        try:
+            from app import db
+            # Check database connection
+            db.session.execute(db.text('SELECT 1'))
+            db_status = "healthy"
+        except Exception as e:
+            logger.error(f"Health check database error: {e}")
+            db_status = "unhealthy"
+            
+        # Check Redis connection
+        redis_status = "healthy" if hasattr(app, 'redis') and app.redis else "unavailable"
+        
+        status_code = 200 if db_status == "healthy" else 503
+        
+        return {
+            "status": "healthy" if db_status == "healthy" else "unhealthy",
+            "database": db_status,
+            "redis": redis_status,
+            "timestamp": datetime.utcnow().isoformat(),
+            "version": "2.0.0"
+        }, status_code
+
+    @app.route('/_ah/health')
+    def gcp_health_check():
+        """GCP App Engine health check endpoint"""
+        return health_check()
+
+    @app.route('/readiness')
+    def readiness_check():
+        """Readiness check for GCP App Engine"""
+        return {"status": "ready", "timestamp": datetime.utcnow().isoformat()}
+
+    @app.route('/_ah/ready')
+    def gcp_readiness_check():
+        """GCP App Engine readiness check endpoint"""
+        return readiness_check()
+
     # Add startup logging
     with app.app_context():
         logger.info("F-AI Accountant application started")
@@ -42,7 +84,7 @@ try:
         # Development server configuration
         debug_mode = os.environ.get('FLASK_ENV') != 'production'
         port = int(os.environ.get('PORT', 8080))
-        host = '0.0.0.0'  # Required for Replit
+        host = '0.0.0.0'  # Required for Replit and GCP
 
         logger.info(f"Starting F-AI Accountant on {host}:{port}")
         logger.info(f"Debug mode: {debug_mode}")
