@@ -61,7 +61,7 @@
                 console.error(`[F-AI Error] ${context}:`, error);
                 this.handlers.forEach(handler => handler(error, context));
             },
-            
+
             addHandler: function(handler) {
                 if (typeof handler === 'function') {
                     this.handlers.push(handler);
@@ -127,7 +127,7 @@
                 };
 
                 const config = Object.assign({}, defaults, options);
-                
+
                 return fetch(url, config)
                     .then(response => {
                         if (!response.ok) {
@@ -156,6 +156,17 @@
 
         // Utility functions
         utils: {
+            formatCurrency: function(amount, currency = 'USD') {
+                try {
+                    return new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: currency
+                    }).format(amount);
+                } catch (e) {
+                    return `${currency} ${amount}`;
+                }
+            },
+
             debounce: function(func, wait) {
                 let timeout;
                 return function executedFunction(...args) {
@@ -177,17 +188,6 @@
                         setTimeout(() => inThrottle = false, limit);
                     }
                 };
-            },
-
-            formatCurrency: function(amount, currency = 'USD') {
-                try {
-                    return new Intl.NumberFormat('en-US', {
-                        style: 'currency',
-                        currency: currency
-                    }).format(amount);
-                } catch (e) {
-                    return `${currency} ${amount}`;
-                }
             },
 
             formatNumber: function(number, decimals = 2) {
@@ -226,7 +226,7 @@
                     this.bindGlobalEvents();
                     this.setupErrorHandling();
                     this.state.initialized = true;
-                    
+
                     console.log(`✅ F-AI Core v${this.config.version} initialized successfully`);
                 } catch (error) {
                     this.errors.log(error, 'Core initialization');

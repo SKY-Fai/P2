@@ -13,18 +13,18 @@
                 activeClass: 'active',
                 loadingClass: 'loading'
             };
-            
+
             this.elements = {
                 navbar: null,
                 uploadSection: null,
                 uploadButton: null
             };
-            
+
             this.state = {
                 currentPage: this.getCurrentPage(),
                 isScrolling: false
             };
-            
+
             this.init();
         }
 
@@ -72,13 +72,13 @@
         bindEvents() {
             // Upload button functionality
             this.setupUploadTrigger();
-            
+
             // Navigation link handling
             this.setupNavigationLinks();
-            
+
             // Scroll tracking
             this.setupScrollTracking();
-            
+
             // Window resize handling
             window.addEventListener('resize', (function() {
                 let timeout;
@@ -114,7 +114,7 @@
 
         handleUploadTrigger() {
             const currentPage = this.getCurrentPage();
-            
+
             if (currentPage === 'accounting' && this.elements.uploadSection) {
                 // Scroll to upload section on current page
                 this.smoothScrollTo(this.elements.uploadSection);
@@ -128,12 +128,12 @@
             // Handle all navigation links
             document.querySelectorAll('a[href]').forEach(link => {
                 const href = link.getAttribute('href');
-                
+
                 // Skip external links and JavaScript links
                 if (href.startsWith('http') || href.startsWith('javascript:') || href === '#') {
                     return;
                 }
-                
+
                 link.addEventListener('click', (e) => {
                     this.handleNavigationClick(e, link);
                 });
@@ -142,10 +142,10 @@
 
         handleNavigationClick(event, link) {
             const href = link.getAttribute('href');
-            
+
             // Add loading state
             this.setLoadingState(true);
-            
+
             // Remove loading state after navigation
             setTimeout(() => {
                 this.setLoadingState(false);
@@ -154,15 +154,15 @@
 
         setupScrollTracking() {
             let scrollTimeout;
-            
+
             window.addEventListener('scroll', () => {
                 this.state.isScrolling = true;
-                
+
                 clearTimeout(scrollTimeout);
                 scrollTimeout = setTimeout(() => {
                     this.state.isScrolling = false;
                 }, 150);
-                
+
                 this.updateActiveSection();
             });
         }
@@ -171,11 +171,11 @@
             const sections = document.querySelectorAll('[data-section]');
             const scrollTop = window.pageYOffset;
             const windowHeight = window.innerHeight;
-            
+
             sections.forEach(section => {
                 const rect = section.getBoundingClientRect();
                 const isVisible = rect.top < windowHeight / 2 && rect.bottom > windowHeight / 2;
-                
+
                 if (isVisible) {
                     this.setActiveSection(section.getAttribute('data-section'));
                 }
@@ -186,7 +186,7 @@
             // Update navigation active states
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.classList.remove(this.config.activeClass);
-                
+
                 if (link.getAttribute('href').includes(sectionName)) {
                     link.classList.add(this.config.activeClass);
                 }
@@ -206,12 +206,12 @@
                 if (startTime === null) startTime = currentTime;
                 const timeElapsed = currentTime - startTime;
                 const progress = Math.min(timeElapsed / duration, 1);
-                
+
                 // Easing function
                 const ease = this.easeInOutCubic(progress);
-                
+
                 window.scrollTo(0, startPosition + (distance * ease));
-                
+
                 if (timeElapsed < duration) {
                     requestAnimationFrame(animateScroll);
                 } else {
@@ -234,7 +234,7 @@
                 element.setAttribute('tabindex', '-1');
             }
             element.focus({ preventScroll: true });
-            
+
             // Visual feedback
             element.classList.add('highlight-section');
             setTimeout(() => {
@@ -249,7 +249,7 @@
 
         setLoadingState(loading) {
             const body = document.body;
-            
+
             if (loading) {
                 body.classList.add(this.config.loadingClass);
                 this.showLoadingIndicator();
@@ -261,7 +261,7 @@
 
         showLoadingIndicator() {
             let indicator = document.querySelector('.navigation-loading');
-            
+
             if (!indicator) {
                 indicator = document.createElement('div');
                 indicator.className = 'navigation-loading';
@@ -273,7 +273,7 @@
                 `;
                 document.body.appendChild(indicator);
             }
-            
+
             indicator.style.display = 'flex';
         }
 
@@ -294,7 +294,7 @@
 
             // Add skip links
             this.addSkipLinks();
-            
+
             // Add loading indicator styles
             this.addLoadingStyles();
         }
@@ -316,15 +316,15 @@
                 z-index: 9999;
                 transition: top 0.3s;
             `;
-            
+
             skipLink.addEventListener('focus', () => {
                 skipLink.style.top = '6px';
             });
-            
+
             skipLink.addEventListener('blur', () => {
                 skipLink.style.top = '-40px';
             });
-            
+
             document.body.insertBefore(skipLink, document.body.firstChild);
         }
 
@@ -343,7 +343,7 @@
                     justify-content: center;
                     z-index: 9999;
                 }
-                
+
                 .loading-spinner {
                     background: white;
                     padding: 20px;
@@ -351,22 +351,22 @@
                     text-align: center;
                     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                 }
-                
+
                 .loading-spinner i {
                     font-size: 24px;
                     margin-bottom: 10px;
                     color: var(--primary-color, #dc3545);
                 }
-                
+
                 .highlight-section {
                     animation: highlight-pulse 2s ease-in-out;
                 }
-                
+
                 @keyframes highlight-pulse {
                     0%, 100% { box-shadow: none; }
                     50% { box-shadow: 0 0 20px rgba(220, 53, 69, 0.3); }
                 }
-                
+
                 .loading * {
                     cursor: wait !important;
                 }
@@ -379,7 +379,10 @@
             this.updateActiveSection();
         }
 
-
+        // Add resize listener with debounce
+        updateLayoutForScreenSize() {
+            // Implementation depends on the FaiCore utils
+        }
 
         // Public API
         scrollToUpload() {
