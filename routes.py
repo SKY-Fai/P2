@@ -38,23 +38,53 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/api/log-error', methods=['POST'])
 @exempt
 def log_error():
-    """Handle frontend error logging"""
+    """Handle frontend error logging with comprehensive tracking"""
     try:
-        error_data = request.get_json() or {}
+        # Handle both JSON and form data
+        if request.is_json:
+            error_data = request.get_json() or {}
+        else:
+            error_data = request.form.to_dict()
+        
         error_message = error_data.get('message', 'Frontend error')
         error_details = error_data.get('details', {})
+        error_type = error_data.get('type', 'general')
+        user_agent = request.headers.get('User-Agent', 'Unknown')
+        ip_address = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
         
-        logging.warning(f"Frontend Error: {error_message} - Details: {error_details}")
+        # Structured error logging
+        structured_error = {
+            'timestamp': datetime.utcnow().isoformat(),
+            'source': 'frontend',
+            'type': error_type,
+            'message': error_message,
+            'details': error_details,
+            'user_agent': user_agent,
+            'ip_address': ip_address,
+            'url': request.referrer or 'unknown',
+            'user_id': getattr(current_user, 'id', None) if current_user and current_user.is_authenticated else None
+        }
+        
+        # Log to application logger
+        logging.warning(f"Frontend Error: {structured_error}")
+        
+        # In production, you might want to store this in database or send to monitoring service
+        if current_app.config.get('FLASK_ENV') == 'production':
+            # Could integrate with external error tracking services here
+            pass
         
         return jsonify({
             'status': 'success',
-            'message': 'Error logged successfully'
+            'message': 'Error logged successfully',
+            'error_id': f"FE_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}_{hash(str(structured_error)) % 10000:04d}"
         }), 200
+        
     except Exception as e:
         logging.error(f"Failed to log frontend error: {e}")
         return jsonify({
             'status': 'error',
-            'message': 'Failed to log error'
+            'message': 'Failed to log error',
+            'error': str(e) if current_app.debug else 'Internal server error'
         }), 500
 
 @main_bp.route('/api/health', methods=['GET'])
@@ -70,8 +100,77 @@ def api_health():
     return jsonify({
         "status": "healthy" if db_status == "healthy" else "degraded",
         "database": db_status,
-        "timestamp": datetime.utcnow().isoformat()
+        "timestamp": datetime.utcnow().isoformat(),
+        "version": "2.0.0",
+        "api_endpoints_available": True
     })
+
+@main_bp.route('/api/frontend-config', methods=['GET'])
+def api_frontend_config():
+    """Get frontend configuration"""
+    try:
+        config = {
+            'api_base_url': request.host_url.rstrip('/'),
+            'features_enabled': {
+                'error_logging': True,
+                'file_upload': True,
+                'automated_accounting': True,
+                'bank_reconciliation': True,
+                'manual_journal': True,
+                'reports_generation': True
+            },
+            'max_file_size': current_app.config.get('MAX_CONTENT_LENGTH', 16 * 1024 * 1024),
+            'allowed_file_types': ['.xlsx', '.xls', '.csv', '.pdf', '.docx'],
+            'user_authenticated': current_user.is_authenticated if current_user else False,
+            'user_permissions': getattr(current_user, 'get_permissions', lambda: [])() if current_user and current_user.is_authenticated else []
+        }
+        
+        return jsonify({
+            'status': 'success',
+            'config': config,
+            'timestamp': datetime.utcnow().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': 'Failed to get frontend config',
+            'error': str(e) if current_app.debug else 'Internal server error'
+        }), 500
+
+@main_bp.route('/api/user-session', methods=['GET'])
+def api_user_session():
+    """Get current user session information"""
+    try:
+        if current_user and current_user.is_authenticated:
+            session_info = {
+                'authenticated': True,
+                'user_id': current_user.id,
+                'username': current_user.username,
+                'email': current_user.email,
+                'role': current_user.role.value if hasattr(current_user.role, 'value') else str(current_user.role),
+                'permissions': getattr(current_user, 'get_permissions', lambda: [])(),
+                'session_id': session.get('_id', 'unknown')
+            }
+        else:
+            session_info = {
+                'authenticated': False,
+                'guest_session': True,
+                'session_id': session.get('_id', 'unknown')
+            }
+        
+        return jsonify({
+            'status': 'success',
+            'session': session_info,
+            'timestamp': datetime.utcnow().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': 'Failed to get session info',
+            'error': str(e) if current_app.debug else 'Internal server error'
+        }), 500
 
 @main_bp.route('/api/upload', methods=['POST'])
 @login_required

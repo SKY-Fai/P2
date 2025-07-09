@@ -123,36 +123,54 @@
 
         // API utilities
         api: {
-            request: function(url, options = {}) {
-                const defaults = {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': FaiCore.config.csrfToken
-                    }
-                };
-
-                const config = Object.assign({}, defaults, options);
-
-                return fetch(url, config)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                        }
-                        return response.json();
-                    })
-                    .catch(error => {
-                        FaiCore.errors.log(error, 'API request');
-                        throw error;
+            // API request method with enhanced error handling
+            async apiRequest(endpoint, options = {}) {
+                try {
+                    const response = await fetch(endpoint, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            ...options.headers
+                        },
+                        ...options
                     });
+
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${data.message || 'Request failed'}`);
+                    }
+
+                    return data;
+                } catch (error) {
+                    console.error('[F-AI Error] API request failed:', {
+                        endpoint,
+                        error: error.message,
+                        options
+                    });
+
+                    // Log error to backend
+                    this.logError('API request failed', { 
+                        endpoint, 
+                        error: error.message,
+                        status: error.status || 'unknown',
+                        method: options.method || 'GET'
+                    });
+
+                    return { 
+                        success: false, 
+                        error: error.message,
+                        endpoint: endpoint
+                    };
+                }
             },
 
             get: function(url, options = {}) {
-                return this.request(url, { ...options, method: 'GET' });
+                return this.apiRequest(url, { ...options, method: 'GET' });
             },
 
             post: function(url, data, options = {}) {
-                return this.request(url, {
+                return this.apiRequest(url, {
                     ...options,
                     method: 'POST',
                     body: JSON.stringify(data)
@@ -326,6 +344,54 @@
             } else {
                 this.dom.ready(callback);
             }
+        },
+        // Error logging with enhanced backend communication
+        logError(message, details = {}) {
+            console.error('[F-AI Error]', message, details);
+
+            // Enhanced error data
+            const errorData = {
+                message: message,
+                details: details,
+                type: details.type || 'javascript',
+                timestamp: new Date().toISOString(),
+                url: window.location.href,
+                userAgent: navigator.userAgent,
+                stack: details.stack || new Error().stack,
+                severity: details.severity || 'error'
+            };
+
+            // Send to backend for logging
+            fetch('/api/log-error', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(errorData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    console.warn('Error logging response not OK:', response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log('[F-AI] Error logged successfully:', data.error_id);
+                }
+            })
+            .catch(err => {
+                console.error('Failed to log error to backend:', err);
+                // Store in localStorage as fallback
+                try {
+                    const errorLog = JSON.parse(localStorage.getItem('f_ai_error_log') || '[]');
+                    errorLog.push(errorData);
+                    localStorage.setItem('f_ai_error_log', JSON.stringify(errorLog.slice(-10))); // Keep last 10 errors
+                } catch (storageErr) {
+                    console.error('Failed to store error in localStorage:', storageErr);
+                }
+            });
         }
     };
 
