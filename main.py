@@ -33,8 +33,7 @@ try:
     register_error_handlers(app)
     
     # Add startup logging
-    @app.before_first_request
-    def startup_logging():
+    with app.app_context():
         logger.info("F-AI Accountant application started")
         logger.info(f"Environment: {os.environ.get('FLASK_ENV', 'development')}")
         logger.info(f"Database URL configured: {'Yes' if os.environ.get('DATABASE_URL') else 'No'}")

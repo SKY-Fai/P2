@@ -10,6 +10,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from sqlalchemy.pool import QueuePool
 import redis
 from dotenv import load_dotenv
+from datetime import datetime
 
 # Load environment variables
 load_dotenv()
@@ -85,24 +86,6 @@ def create_app():
         logging.warning(f"Redis connection failed: {e}. Proceeding without caching.")
         app.redis = None
     
-    # Initialize enhanced error handling, logging, caching, and rate limiting
-    from utils.api_error_handler import register_api_error_handlers
-    from utils.logging_config import setup_logging
-    from utils.caching_layer import setup_caching
-    from utils.rate_limiter import setup_rate_limiting
-    
-    # Setup structured logging
-    setup_logging(app)
-    
-    # Setup caching layer
-    setup_caching(app)
-    
-    # Setup rate limiting
-    setup_rate_limiting(app)
-    
-    # Register enhanced error handlers
-    register_api_error_handlers(app)
-    
     # Initialize extensions
     db.init_app(app)
     login_manager.init_app(app)
@@ -151,50 +134,20 @@ def create_app():
             "timestamp": datetime.utcnow().isoformat()
         }
     
-    # Add request middleware
-    @app.before_request
-    def before_request():
-        import uuid
-        from flask import g
-        g.request_id = str(uuid.uuid4())
-        g.start_time = time.time()
-    
-    @app.after_request  
-    def after_request(response):
-        from flask import g
-        from utils.logging_config import APILogger
-        from utils.rate_limiter import SecurityMiddleware
-        
-        # Log API access
-        if hasattr(g, 'start_time'):
-            response_time = (time.time() - g.start_time) * 1000
-            APILogger.log_response(
-                endpoint=request.endpoint,
-                method=request.method,
-                status_code=response.status_code,
-                response_time=response_time,
-                user_id=getattr(g, 'current_user', {}).get('id')
-            )
-        
-        # Apply security headers
-        SecurityMiddleware.apply_security_headers(response)
-        
-        # Add request ID to response
-        if hasattr(g, 'request_id'):
-            response.headers['X-Request-ID'] = g.request_id
-        
-        return response
+    # Setup structured logging
+    from utils.logging_config import setup_logging
+    setup_logging()
     
     # Register blueprints
     from auth import auth_bp
     from routes import main_bp
     from admin_routes import admin_bp
-    from docs.api_documentation import api_docs_bp
+    from utils.api_documentation import docs_bp
     
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(main_bp)
     app.register_blueprint(admin_bp, url_prefix="/admin")
-    app.register_blueprint(api_docs_bp)
+    app.register_blueprint(docs_bp)
     
     # Create database tables
     with app.app_context():

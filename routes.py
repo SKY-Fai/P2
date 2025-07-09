@@ -33,6 +33,86 @@ from utils.user_code_generator import UserCodeGenerator
 
 main_bp = Blueprint('main', __name__)
 
+# API Endpoints for frontend communication
+@main_bp.route('/api/log-error', methods=['POST'])
+def log_error():
+    """Handle frontend error logging"""
+    try:
+        error_data = request.get_json() or {}
+        error_message = error_data.get('message', 'Frontend error')
+        error_details = error_data.get('details', {})
+        
+        logging.warning(f"Frontend Error: {error_message} - Details: {error_details}")
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Error logged successfully'
+        }), 200
+    except Exception as e:
+        logging.error(f"Failed to log frontend error: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': 'Failed to log error'
+        }), 500
+
+@main_bp.route('/api/health', methods=['GET'])
+def api_health():
+    """API health check endpoint"""
+    try:
+        # Check database connection
+        db.session.execute('SELECT 1')
+        db_status = "healthy"
+    except Exception as e:
+        db_status = f"unhealthy: {str(e)}"
+        
+    return jsonify({
+        "status": "healthy" if db_status == "healthy" else "degraded",
+        "database": db_status,
+        "timestamp": datetime.utcnow().isoformat()
+    })
+
+@main_bp.route('/api/upload', methods=['POST'])
+@login_required
+def api_upload():
+    """API endpoint for file uploads"""
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file provided'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+        
+        if file and file.filename.lower().endswith(('.xlsx', '.xls', '.csv')):
+            filename = secure_filename(file.filename)
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"{timestamp}_{filename}"
+            
+            upload_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            file.save(upload_path)
+            
+            return jsonify({
+                'status': 'success',
+                'message': 'File uploaded successfully',
+                'filename': filename
+            }), 200
+        else:
+            return jsonify({'error': 'Invalid file type'}), 400
+            
+    except Exception as e:
+        logging.error(f"File upload error: {e}")
+        return jsonify({'error': 'Upload failed'}), 500
+
+@main_bp.route('/api/validation/status', methods=['GET'])
+@login_required
+def validation_status():
+    """Get validation status"""
+    return jsonify({
+        'status': 'ready',
+        'message': 'Validation system ready',
+        'timestamp': datetime.utcnow().isoformat()
+    })
+
 @main_bp.route('/')
 def index():
     if current_user.is_authenticated:
@@ -4616,3 +4696,4 @@ def download_package():
             return "Package not found", 404
     except Exception as e:
         return f"Download error: {str(e)}", 500
+
