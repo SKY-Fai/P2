@@ -92,9 +92,11 @@ try:
         # Development server configuration
         debug_mode = os.environ.get('FLASK_ENV') != 'production'
         # Get port from environment variable
+        port_env = os.environ.get('PORT', '5000')
         try:
-            port = int(os.environ.get('PORT', 5000))
+            port = int(port_env)
         except (ValueError, TypeError):
+            logger.warning(f"Invalid PORT value '{port_env}', using default 5000")
             port = 5000
         host = '0.0.0.0'  # Required for Replit
 
