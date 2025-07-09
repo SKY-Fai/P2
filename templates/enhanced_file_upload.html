@@ -1,0 +1,863 @@
+
+{% extends "base.html" %}
+
+{% block title %}Enhanced File Upload - F-AI Accountant{% endblock %}
+
+{% block extra_head %}
+<style>
+    :root {
+        --primary-color: #000000;
+        --secondary-color: #f8f9fa;
+        --accent-color: #007bff;
+        --border-color: #dee2e6;
+        --success-color: #28a745;
+        --warning-color: #ffc107;
+        --danger-color: #dc3545;
+    }
+
+    .upload-container {
+        background: #f0f8ff;
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .folder-structure {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .folder-item {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .folder-item:hover {
+        border-color: var(--accent-color);
+        box-shadow: 0 4px 8px rgba(0,123,255,0.15);
+        transform: translateY(-2px);
+    }
+
+    .folder-item.active {
+        border-color: var(--success-color);
+        background: rgba(40,167,69,0.05);
+    }
+
+    .file-list-panel {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    .file-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        margin-bottom: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .file-item:hover {
+        background: #f8f9fa;
+        border-color: var(--accent-color);
+    }
+
+    .file-item.selected {
+        background: rgba(0,123,255,0.1);
+        border-color: var(--accent-color);
+    }
+
+    .file-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        margin-right: 1rem;
+        color: white;
+        font-size: 1.2rem;
+    }
+
+    .file-icon.excel { background: #217346; }
+    .file-icon.word { background: #2b579a; }
+    .file-icon.pdf { background: #d32f2f; }
+
+    .preview-panel {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        min-height: 500px;
+        max-height: 600px;
+        overflow-y: auto;
+    }
+
+    .upload-drop-zone {
+        border: 3px dashed #ccc;
+        border-radius: 12px;
+        padding: 3rem 2rem;
+        text-align: center;
+        background: #fafafa;
+        transition: all 0.3s ease;
+        margin-bottom: 2rem;
+    }
+
+    .upload-drop-zone.dragover {
+        border-color: var(--accent-color);
+        background: rgba(0,123,255,0.05);
+    }
+
+    .file-upload-input {
+        display: none;
+    }
+
+    .progress-container {
+        background: white;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+        display: none;
+    }
+
+    .folder-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: var(--primary-color);
+        color: white;
+        border-radius: 15px;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .preview-header {
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .scrollbar-custom {
+        scrollbar-width: thin;
+        scrollbar-color: #888 #f1f1f1;
+    }
+
+    .scrollbar-custom::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .scrollbar-custom::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .scrollbar-custom::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
+
+    .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="upload-container">
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="text-center">
+                    <h1 class="display-4 fw-bold mb-3">Professional File Upload System</h1>
+                    <p class="lead">Upload files to organized folders with instant preview</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Upload Interface -->
+        <div class="row">
+            <!-- Left Panel: Folder Structure & Upload -->
+            <div class="col-lg-4 col-md-6">
+                <div class="folder-structure">
+                    <h4 class="mb-3">
+                        <i class="fas fa-folder-open me-2"></i>Select Upload Folder
+                    </h4>
+                    
+                    <!-- Upload Drop Zone -->
+                    <div class="upload-drop-zone" id="uploadDropZone">
+                        <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                        <h5>Drag & Drop Files Here</h5>
+                        <p class="text-muted">or click to browse</p>
+                        <input type="file" id="fileUploadInput" class="file-upload-input" multiple accept=".xlsx,.xls,.docx,.doc,.pdf">
+                        <button type="button" class="btn btn-primary btn-lg" id="browseFilesBtn">
+                            <i class="fas fa-folder-open me-2"></i>Browse Files
+                        </button>
+                    </div>
+
+                    <!-- Progress Container -->
+                    <div class="progress-container" id="progressContainer">
+                        <h6>Upload Progress</h6>
+                        <div class="progress mb-2">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" id="uploadProgress" style="width: 0%"></div>
+                        </div>
+                        <small class="text-muted" id="progressText">Ready to upload...</small>
+                    </div>
+
+                    <!-- Folder Categories -->
+                    <div class="folder-categories">
+                        <div class="folder-item" data-folder="sales">
+                            <div class="folder-badge">0</div>
+                            <i class="fas fa-cash-register fa-2x text-success mb-2"></i>
+                            <h6 class="fw-bold">Sales Documents</h6>
+                            <p class="text-muted mb-0">Invoices, receipts, sales reports</p>
+                        </div>
+
+                        <div class="folder-item" data-folder="purchase">
+                            <div class="folder-badge">0</div>
+                            <i class="fas fa-shopping-cart fa-2x text-danger mb-2"></i>
+                            <h6 class="fw-bold">Purchase Documents</h6>
+                            <p class="text-muted mb-0">Bills, purchase orders, vendor invoices</p>
+                        </div>
+
+                        <div class="folder-item" data-folder="financial">
+                            <div class="folder-badge">0</div>
+                            <i class="fas fa-chart-line fa-2x text-info mb-2"></i>
+                            <h6 class="fw-bold">Financial Reports</h6>
+                            <p class="text-muted mb-0">Bank statements, financial analysis</p>
+                        </div>
+
+                        <div class="folder-item" data-folder="tax">
+                            <div class="folder-badge">0</div>
+                            <i class="fas fa-receipt fa-2x text-warning mb-2"></i>
+                            <h6 class="fw-bold">Tax Documents</h6>
+                            <p class="text-muted mb-0">GST returns, tax receipts</p>
+                        </div>
+
+                        <div class="folder-item" data-folder="miscellaneous">
+                            <div class="folder-badge">0</div>
+                            <i class="fas fa-file-alt fa-2x text-secondary mb-2"></i>
+                            <h6 class="fw-bold">Miscellaneous</h6>
+                            <p class="text-muted mb-0">Other business documents</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center Panel: File List -->
+            <div class="col-lg-4 col-md-6">
+                <div class="file-list-panel scrollbar-custom">
+                    <h5 class="mb-3">
+                        <i class="fas fa-list me-2"></i>Uploaded Files
+                        <span class="badge bg-primary ms-2" id="fileCount">0</span>
+                    </h5>
+
+                    <div id="fileListContainer">
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-file-upload fa-3x mb-3"></i>
+                            <p>No files uploaded yet</p>
+                            <small>Upload files to see them listed here</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: File Preview -->
+            <div class="col-lg-4 col-md-12">
+                <div class="preview-panel scrollbar-custom">
+                    <div class="preview-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-eye me-2"></i>File Preview
+                        </h5>
+                    </div>
+
+                    <div id="previewContainer">
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-search fa-3x mb-3"></i>
+                            <p>Select a file to preview</p>
+                            <small>Click on any file from the list to preview its contents</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <button class="btn btn-success btn-lg me-3" id="processAllBtn" disabled>
+                    <i class="fas fa-cogs me-2"></i>Process All Files
+                </button>
+                <button class="btn btn-info btn-lg me-3" id="downloadTemplateBtn">
+                    <i class="fas fa-download me-2"></i>Download Templates
+                </button>
+                <button class="btn btn-secondary btn-lg" id="clearAllBtn">
+                    <i class="fas fa-trash me-2"></i>Clear All
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- File Preview Modal for Full View -->
+<div class="modal fade" id="filePreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-file me-2"></i>Full File Preview
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                <div id="modalPreviewContent">
+                    <!-- Preview content will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="downloadSelectedFile">
+                    <i class="fas fa-download me-2"></i>Download
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+$(document).ready(function() {
+    console.log('Enhanced File Upload System Initializing...');
+    
+    let uploadedFiles = {};
+    let selectedFolder = null;
+    let selectedFile = null;
+    
+    // Initialize drag and drop
+    initializeDragAndDrop();
+    
+    // Initialize folder selection
+    initializeFolderSelection();
+    
+    // Initialize file upload
+    initializeFileUpload();
+    
+    function initializeDragAndDrop() {
+        const dropZone = $('#uploadDropZone');
+        
+        dropZone.on('dragover', function(e) {
+            e.preventDefault();
+            $(this).addClass('dragover');
+        });
+        
+        dropZone.on('dragleave', function(e) {
+            e.preventDefault();
+            $(this).removeClass('dragover');
+        });
+        
+        dropZone.on('drop', function(e) {
+            e.preventDefault();
+            $(this).removeClass('dragover');
+            
+            const files = e.originalEvent.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileUpload(Array.from(files));
+            }
+        });
+        
+        $('#browseFilesBtn').click(function() {
+            $('#fileUploadInput').click();
+        });
+        
+        $('#fileUploadInput').change(function() {
+            const files = Array.from(this.files);
+            if (files.length > 0) {
+                handleFileUpload(files);
+            }
+        });
+    }
+    
+    function initializeFolderSelection() {
+        $('.folder-item').click(function() {
+            $('.folder-item').removeClass('active');
+            $(this).addClass('active');
+            selectedFolder = $(this).data('folder');
+            console.log('Selected folder:', selectedFolder);
+        });
+    }
+    
+    function initializeFileUpload() {
+        $('#processAllBtn').click(function() {
+            processAllFiles();
+        });
+        
+        $('#clearAllBtn').click(function() {
+            clearAllFiles();
+        });
+        
+        $('#downloadTemplateBtn').click(function() {
+            downloadTemplate();
+        });
+    }
+    
+    function handleFileUpload(files) {
+        if (!selectedFolder) {
+            alert('Please select a folder first');
+            return;
+        }
+        
+        showProgress();
+        
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress > 95) progress = 95;
+            updateProgress(progress, 'Uploading files...');
+        }, 200);
+        
+        // Simulate file upload processing
+        setTimeout(() => {
+            clearInterval(progressInterval);
+            updateProgress(100, 'Upload complete!');
+            
+            files.forEach(file => {
+                addFileToFolder(file, selectedFolder);
+            });
+            
+            updateFileList();
+            updateFolderBadges();
+            hideProgress();
+            
+        }, 2000);
+    }
+    
+    function addFileToFolder(file, folder) {
+        if (!uploadedFiles[folder]) {
+            uploadedFiles[folder] = [];
+        }
+        
+        const fileInfo = {
+            id: Date.now() + Math.random(),
+            name: file.name,
+            size: file.size,
+            type: getFileType(file.name),
+            folder: folder,
+            uploadedAt: new Date(),
+            file: file
+        };
+        
+        uploadedFiles[folder].push(fileInfo);
+    }
+    
+    function updateFileList() {
+        const container = $('#fileListContainer');
+        const allFiles = Object.values(uploadedFiles).flat();
+        
+        if (allFiles.length === 0) {
+            container.html(`
+                <div class="text-center text-muted py-5">
+                    <i class="fas fa-file-upload fa-3x mb-3"></i>
+                    <p>No files uploaded yet</p>
+                    <small>Upload files to see them listed here</small>
+                </div>
+            `);
+            return;
+        }
+        
+        let html = '';
+        allFiles.forEach(file => {
+            const icon = getFileIcon(file.type);
+            const size = formatFileSize(file.size);
+            
+            html += `
+                <div class="file-item" data-file-id="${file.id}">
+                    <div class="file-icon ${file.type}">
+                        <i class="${icon}"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">${file.name}</h6>
+                        <small class="text-muted">${size} • ${file.folder}</small>
+                    </div>
+                    <div class="text-end">
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="previewFile('${file.id}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removeFile('${file.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.html(html);
+        $('#fileCount').text(allFiles.length);
+        
+        // Add click handlers for file selection
+        $('.file-item').click(function(e) {
+            if ($(e.target).closest('button').length === 0) {
+                $('.file-item').removeClass('selected');
+                $(this).addClass('selected');
+                const fileId = $(this).data('file-id');
+                previewFile(fileId);
+            }
+        });
+        
+        $('#processAllBtn').prop('disabled', allFiles.length === 0);
+    }
+    
+    function updateFolderBadges() {
+        $('.folder-item').each(function() {
+            const folder = $(this).data('folder');
+            const count = uploadedFiles[folder] ? uploadedFiles[folder].length : 0;
+            $(this).find('.folder-badge').text(count);
+        });
+    }
+    
+    function previewFile(fileId) {
+        const allFiles = Object.values(uploadedFiles).flat();
+        const file = allFiles.find(f => f.id == fileId);
+        
+        if (!file) return;
+        
+        selectedFile = file;
+        
+        const previewContainer = $('#previewContainer');
+        
+        // Generate preview based on file type
+        let previewHtml = `
+            <div class="preview-header">
+                <h6 class="fw-bold">${file.name}</h6>
+                <small class="text-muted">
+                    ${formatFileSize(file.size)} • ${file.type.toUpperCase()} • 
+                    Uploaded: ${file.uploadedAt.toLocaleString()}
+                </small>
+            </div>
+        `;
+        
+        if (file.type === 'excel') {
+            previewHtml += generateExcelPreview(file);
+        } else if (file.type === 'word') {
+            previewHtml += generateWordPreview(file);
+        } else if (file.type === 'pdf') {
+            previewHtml += generatePdfPreview(file);
+        }
+        
+        previewHtml += `
+            <div class="mt-3">
+                <button class="btn btn-primary btn-sm me-2" onclick="openFullPreview('${fileId}')">
+                    <i class="fas fa-expand me-1"></i>Full Preview
+                </button>
+                <button class="btn btn-success btn-sm" onclick="processFile('${fileId}')">
+                    <i class="fas fa-cogs me-1"></i>Process File
+                </button>
+            </div>
+        `;
+        
+        previewContainer.html(previewHtml);
+    }
+    
+    function generateExcelPreview(file) {
+        return `
+            <div class="preview-content">
+                <div class="alert alert-info">
+                    <i class="fas fa-file-excel me-2"></i>
+                    <strong>Excel Spreadsheet Preview</strong>
+                </div>
+                
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table class="table table-bordered table-sm">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Column A</th>
+                                <th>Column B</th>
+                                <th>Column C</th>
+                                <th>Column D</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Date</td><td>Description</td><td>Amount</td><td>Category</td></tr>
+                            <tr><td>2024-01-15</td><td>Office Supplies</td><td>₹5,000</td><td>Expense</td></tr>
+                            <tr><td>2024-01-16</td><td>Client Payment</td><td>₹50,000</td><td>Income</td></tr>
+                            <tr><td>2024-01-17</td><td>Software License</td><td>₹12,000</td><td>Expense</td></tr>
+                            <tr><td>2024-01-18</td><td>Consultation Fee</td><td>₹25,000</td><td>Income</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-2">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        This is a sample preview. Actual data will be shown after processing.
+                    </small>
+                </div>
+            </div>
+        `;
+    }
+    
+    function generateWordPreview(file) {
+        return `
+            <div class="preview-content">
+                <div class="alert alert-primary">
+                    <i class="fas fa-file-word me-2"></i>
+                    <strong>Word Document Preview</strong>
+                </div>
+                
+                <div class="document-preview" style="background: white; border: 1px solid #ddd; padding: 20px; border-radius: 5px; max-height: 300px; overflow-y: auto;">
+                    <h5>Financial Report Summary</h5>
+                    <p>This document contains important financial information and analysis for the current quarter.</p>
+                    
+                    <h6>Key Highlights:</h6>
+                    <ul>
+                        <li>Total Revenue: ₹2,50,000</li>
+                        <li>Total Expenses: ₹1,80,000</li>
+                        <li>Net Profit: ₹70,000</li>
+                        <li>Growth Rate: 15%</li>
+                    </ul>
+                    
+                    <p>The financial performance shows positive growth compared to the previous quarter...</p>
+                    
+                    <h6>Recommendations:</h6>
+                    <p>Based on the analysis, we recommend focusing on cost optimization and revenue diversification strategies.</p>
+                </div>
+                
+                <div class="mt-2">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        This is a sample preview. Actual document content will be extracted after processing.
+                    </small>
+                </div>
+            </div>
+        `;
+    }
+    
+    function generatePdfPreview(file) {
+        return `
+            <div class="preview-content">
+                <div class="alert alert-danger">
+                    <i class="fas fa-file-pdf me-2"></i>
+                    <strong>PDF Document Preview</strong>
+                </div>
+                
+                <div class="pdf-preview" style="background: #f8f9fa; border: 1px solid #ddd; padding: 20px; border-radius: 5px; max-height: 300px; overflow-y: auto;">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-file-pdf fa-4x text-danger"></i>
+                    </div>
+                    
+                    <h6 class="text-center">Invoice #INV-2024-001</h6>
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>From:</strong><br>
+                            ABC Company Ltd.<br>
+                            123 Business Street<br>
+                            Mumbai, Maharashtra
+                        </div>
+                        <div class="col-6">
+                            <strong>To:</strong><br>
+                            XYZ Client Pvt Ltd.<br>
+                            456 Client Avenue<br>
+                            Delhi, India
+                        </div>
+                    </div>
+                    
+                    <table class="table table-sm mt-3">
+                        <tr><td>Service</td><td>Consulting</td><td>₹50,000</td></tr>
+                        <tr><td>Tax (18%)</td><td>GST</td><td>₹9,000</td></tr>
+                        <tr><td><strong>Total</strong></td><td></td><td><strong>₹59,000</strong></td></tr>
+                    </table>
+                </div>
+                
+                <div class="mt-2">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        This is a sample preview. Actual PDF content will be extracted after processing.
+                    </small>
+                </div>
+            </div>
+        `;
+    }
+    
+    function openFullPreview(fileId) {
+        if (selectedFile) {
+            $('#modalPreviewContent').html($('#previewContainer').html());
+            $('#filePreviewModal').modal('show');
+        }
+    }
+    
+    function processFile(fileId) {
+        const allFiles = Object.values(uploadedFiles).flat();
+        const file = allFiles.find(f => f.id == fileId);
+        
+        if (!file) return;
+        
+        // Show processing status
+        showProgress();
+        updateProgress(0, 'Processing file...');
+        
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            progress += Math.random() * 20;
+            if (progress > 90) progress = 90;
+            updateProgress(progress, `Processing ${file.name}...`);
+        }, 300);
+        
+        // Simulate processing
+        setTimeout(() => {
+            clearInterval(progressInterval);
+            updateProgress(100, 'Processing complete!');
+            
+            setTimeout(() => {
+                hideProgress();
+                alert(`File "${file.name}" processed successfully! Check the reports section for results.`);
+            }, 1000);
+        }, 3000);
+    }
+    
+    function processAllFiles() {
+        const allFiles = Object.values(uploadedFiles).flat();
+        
+        if (allFiles.length === 0) {
+            alert('No files to process');
+            return;
+        }
+        
+        if (confirm(`Process all ${allFiles.length} files?`)) {
+            showProgress();
+            updateProgress(0, 'Processing all files...');
+            
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress > 90) progress = 90;
+                updateProgress(progress, `Processing ${allFiles.length} files...`);
+            }, 500);
+            
+            // Simulate processing
+            setTimeout(() => {
+                clearInterval(progressInterval);
+                updateProgress(100, 'All files processed successfully!');
+                
+                setTimeout(() => {
+                    hideProgress();
+                    alert(`All ${allFiles.length} files processed successfully! Check the reports section for consolidated results.`);
+                }, 1000);
+            }, 5000);
+        }
+    }
+    
+    function clearAllFiles() {
+        if (confirm('Clear all uploaded files?')) {
+            uploadedFiles = {};
+            selectedFile = null;
+            updateFileList();
+            updateFolderBadges();
+            $('#previewContainer').html(`
+                <div class="text-center text-muted py-5">
+                    <i class="fas fa-search fa-3x mb-3"></i>
+                    <p>Select a file to preview</p>
+                    <small>Click on any file from the list to preview its contents</small>
+                </div>
+            `);
+        }
+    }
+    
+    function removeFile(fileId) {
+        if (confirm('Remove this file?')) {
+            // Find and remove file from uploadedFiles
+            Object.keys(uploadedFiles).forEach(folder => {
+                uploadedFiles[folder] = uploadedFiles[folder].filter(file => file.id != fileId);
+            });
+            
+            updateFileList();
+            updateFolderBadges();
+            
+            if (selectedFile && selectedFile.id == fileId) {
+                selectedFile = null;
+                $('#previewContainer').html(`
+                    <div class="text-center text-muted py-5">
+                        <i class="fas fa-search fa-3x mb-3"></i>
+                        <p>Select a file to preview</p>
+                        <small>Click on any file from the list to preview its contents</small>
+                    </div>
+                `);
+            }
+        }
+    }
+    
+    function downloadTemplate() {
+        const templates = [
+            'Sales Invoice Template.xlsx',
+            'Purchase Bill Template.xlsx',
+            'Financial Report Template.xlsx',
+            'Tax Document Template.xlsx',
+            'General Template.xlsx'
+        ];
+        
+        const templateList = templates.map(t => `• ${t}`).join('\n');
+        alert(`Available Templates:\n\n${templateList}\n\nTemplates will be downloaded shortly.`);
+    }
+    
+    // Utility functions
+    function getFileType(filename) {
+        const ext = filename.split('.').pop().toLowerCase();
+        if (['xlsx', 'xls'].includes(ext)) return 'excel';
+        if (['docx', 'doc'].includes(ext)) return 'word';
+        if (ext === 'pdf') return 'pdf';
+        return 'other';
+    }
+    
+    function getFileIcon(type) {
+        switch(type) {
+            case 'excel': return 'fas fa-file-excel';
+            case 'word': return 'fas fa-file-word';
+            case 'pdf': return 'fas fa-file-pdf';
+            default: return 'fas fa-file';
+        }
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    function showProgress() {
+        $('#progressContainer').show();
+    }
+    
+    function hideProgress() {
+        setTimeout(() => {
+            $('#progressContainer').hide();
+            updateProgress(0, 'Ready to upload...');
+        }, 2000);
+    }
+    
+    function updateProgress(percent, text) {
+        $('#uploadProgress').css('width', percent + '%');
+        $('#progressText').text(text);
+    }
+    
+    console.log('✅ Enhanced File Upload System Ready');
+});
+</script>
+{% endblock %}

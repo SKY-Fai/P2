@@ -304,6 +304,12 @@ def upload_file():
 def file_interaction():
     return render_template('file_interaction.html')
 
+@main_bp.route('/enhanced-upload')
+@login_required
+def enhanced_upload():
+    """Enhanced file upload system with folder structure and preview"""
+    return render_template('enhanced_file_upload.html')
+
 @main_bp.route('/process-file', methods=['POST'])
 @login_required
 def process_file():
@@ -3865,6 +3871,111 @@ def api_bank_reconciliation_dashboard():
         
     except Exception as e:
         return jsonify({'error': f'Error getting dashboard data: {str(e)}'}), 500
+
+@main_bp.route('/api/enhanced-upload/process', methods=['POST'])
+@login_required
+def api_enhanced_upload_process():
+    """Process enhanced file upload with folder structure"""
+    try:
+        if not request.files:
+            return jsonify({'error': 'No files uploaded'}), 400
+        
+        folder_type = request.form.get('folder_type', 'miscellaneous')
+        files = request.files.getlist('files')
+        
+        if not files or not files[0].filename:
+            return jsonify({'error': 'No valid files provided'}), 400
+        
+        # Create upload directory
+        upload_dir = os.path.join('uploads_enhanced', folder_type)
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        processed_files = []
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        
+        for i, file in enumerate(files):
+            if file and file.filename:
+                # Secure filename
+                filename = secure_filename(file.filename)
+                safe_filename = f"{timestamp}_{i+1}_{filename}"
+                file_path = os.path.join(upload_dir, safe_filename)
+                
+                # Save file
+                file.save(file_path)
+                
+                # Get file info
+                file_info = {
+                    'id': f"{timestamp}_{i+1}",
+                    'name': file.filename,
+                    'safe_name': safe_filename,
+                    'path': file_path,
+                    'size': os.path.getsize(file_path),
+                    'type': get_file_type_from_extension(file.filename),
+                    'folder': folder_type,
+                    'uploaded_at': datetime.now().isoformat()
+                }
+                
+                processed_files.append(file_info)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Successfully uploaded {len(processed_files)} files',
+            'files': processed_files,
+            'folder': folder_type
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Upload failed: {str(e)}'}), 500
+
+def get_file_type_from_extension(filename):
+    """Get file type from extension"""
+    ext = filename.lower().split('.')[-1]
+    if ext in ['xlsx', 'xls']:
+        return 'excel'
+    elif ext in ['docx', 'doc']:
+        return 'word'
+    elif ext == 'pdf':
+        return 'pdf'
+    else:
+        return 'other'
+
+@main_bp.route('/api/enhanced-upload/preview/<file_id>')
+@login_required
+def api_enhanced_upload_preview(file_id):
+    """Get file preview data"""
+    try:
+        # In a real implementation, you would retrieve the actual file
+        # For demo, return sample preview data
+        
+        preview_data = {
+            'excel': {
+                'type': 'table',
+                'headers': ['Date', 'Description', 'Amount', 'Category'],
+                'rows': [
+                    ['2024-01-15', 'Office Supplies', '₹5,000', 'Expense'],
+                    ['2024-01-16', 'Client Payment', '₹50,000', 'Income'],
+                    ['2024-01-17', 'Software License', '₹12,000', 'Expense'],
+                    ['2024-01-18', 'Consultation Fee', '₹25,000', 'Income']
+                ]
+            },
+            'word': {
+                'type': 'text',
+                'content': 'Financial Report Summary\n\nThis document contains important financial information...'
+            },
+            'pdf': {
+                'type': 'structured',
+                'content': 'Invoice #INV-2024-001\nABC Company Ltd.\nTotal: ₹59,000'
+            }
+        }
+        
+        # Return sample data based on file type
+        return jsonify({
+            'success': True,
+            'preview': preview_data.get('excel', {})  # Default to excel preview
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Preview failed: {str(e)}'}), 500
 
 @main_bp.route('/api/bulk-folder-upload', methods=['POST'])
 @login_required

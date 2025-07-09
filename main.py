@@ -91,7 +91,7 @@ try:
     if __name__ == '__main__':
         # Development server configuration
         debug_mode = os.environ.get('FLASK_ENV') != 'production'
-        port = int(os.environ.get('PORT', 5000))
+        port = int(os.environ.get('PORT', '5000'))
         host = '0.0.0.0'  # Required for Replit
 
         logger.info(f"Starting F-AI Accountant on {host}:{port}")
